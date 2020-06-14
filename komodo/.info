@@ -1,0 +1,4 @@
+IMAGE_NAME=komodobuild
+IMAGE_VERSION=0.1
+OWNER=meshbits
+REPOSITORY=komodo
