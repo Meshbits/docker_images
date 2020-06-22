@@ -2,10 +2,7 @@ FROM ubuntu:20.04
 
 ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update -qq -y \
-    && apt-get -qq -y remove php5.6-fpm php7.0-fpm php7.1-fpm php7.2-fpm \
-        php7.3-fpm php7.3-common php7.4-fpm msodbcsql17 mysql-server* \
-  && apt-get update -qq -y \
   && ACCEPT_EULA=Y apt-get upgrade -qq -y \
-  && apt-get install -qq -y \
+  && apt-get install --no-install-recommends -qq -y \
     curl python3 python3-dev python3-setuptools python3-pip libcurl4-openssl-dev libssl-dev \
   && apt-get clean -qq -y && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
