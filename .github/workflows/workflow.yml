@@ -10,20 +10,30 @@ env:
   IMAGE_REPO: docker.pkg.github.com/${{ github.repository }}/${{ github.job }}
   IMAGE_VERSION: 0.${{ github.run_number }}
 
+defaults:
+  run:
+    shell: bash
+
 jobs:
 
   komodobuild_linux:
     name: komodobuild_linux
     runs-on: ubuntu-20.04
+    env:
+      OS: linux
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Build and tag image
+    - name: repo_lowercase
       run: |
         repo_lowercase="${{ env.IMAGE_REPO }}:${{ env.IMAGE_VERSION }}"
-        docker build -t "${repo_lowercase,,}" -f komodo/Dockerfile_linux komodo/
+        echo "##[set-output name=repo;]$(echo ${repo_lowercase,,})"
+      id: repo_lowercase
+
+    - name: Build and tag image
+      run: docker build -t "${{ steps.repo_lowercase.outputs.repo }}" -f komodo/Dockerfile_${{ OS }} komodo/
 
     - name: Docker Login
       uses: azure/docker-login@v1
@@ -33,23 +43,26 @@ jobs:
         password: ${{ secrets.ns408_packages_token }}
 
     - name: Publish image
-      run: docker push "${{ env.IMAGE_REPO }}:${{ env.IMAGE_VERSION }}"
+      run: docker push "${{ steps.repo_lowercase.outputs.repo }}"
 
   komodobuild_win:
     name: komodobuild_win
     runs-on: ubuntu-20.04
+    env:
+      OS: win
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
-      with:
-        repository: "Meshbits/docker_images"
-        branch: "master"
 
-    - name: Build and tag image
+    - name: repo_lowercase
       run: |
         repo_lowercase="${{ env.IMAGE_REPO }}:${{ env.IMAGE_VERSION }}"
-        docker build -t "${repo_lowercase,,}" -f komodo/Dockerfile_linux komodo/
+        echo "##[set-output name=repo;]$(echo ${repo_lowercase,,})"
+      id: repo_lowercase
+
+    - name: Build and tag image
+      run: docker build -t "${{ steps.repo_lowercase.outputs.repo }}" -f komodo/Dockerfile_${{ OS }} komodo/
 
     - name: Docker Login
       uses: azure/docker-login@v1
@@ -59,4 +72,4 @@ jobs:
         password: ${{ secrets.ns408_packages_token }}
 
     - name: Publish image
-      run: docker push "${{ env.IMAGE_REPO }}:${{ env.IMAGE_VERSION }}"
+      run: docker push "${{ steps.repo_lowercase.outputs.repo }}"
