@@ -6,22 +6,24 @@ on:
   schedule:
     - cron: '* 3 * * *'
 
+env:
+  IMAGE_REPO: docker.pkg.github.com/${{ github.repository }}/${{ github.job }}
+  IMAGE_VERSION: 0.${{ github.run_number }}
+
 jobs:
 
   komodobuild_linux:
     name: komodobuild_linux
     runs-on: ubuntu-20.04
-    env:
-      IMAGE_REPO: docker.pkg.github.com/${{ github.repository }}/${{ github.job }}
-      IMAGE_VERSION: 0.${{ github.run_number }}
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Build and tag image - "${{ env.IMAGE_REPO }}:${{ env.IMAGE_VERSION }}"
+    - name: Build and tag image
       run: |
-        docker build -t "${{ env.IMAGE_REPO }}:${{ env.IMAGE_VERSION }}" -f komodo/Dockerfile_linux komodo/
+        repo_lowercase="${{ env.IMAGE_REPO }}:${{ env.IMAGE_VERSION }}"
+        docker build -t "${repo_lowercase,,}" -f komodo/Dockerfile_linux komodo/
 
     - name: Docker Login
       uses: azure/docker-login@v1
@@ -36,9 +38,6 @@ jobs:
   komodobuild_win:
     name: komodobuild_win
     runs-on: ubuntu-20.04
-    env:
-      IMAGE_REPO: docker.pkg.github.com/${{ github.repository }}/${{ github.job }}
-      IMAGE_VERSION: 0.${{ github.run_number }}
 
     steps:
     - name: Checkout code
@@ -47,10 +46,10 @@ jobs:
         repository: "Meshbits/docker_images"
         branch: "master"
 
-
-    - name: Build and tag image - "${{ env.IMAGE_REPO }}:${{ env.IMAGE_VERSION }}"
+    - name: Build and tag image
       run: |
-        docker build -t "${{ env.IMAGE_REPO }}:${{ env.IMAGE_VERSION }}" -f komodo/Dockerfile_win komodo/
+        repo_lowercase="${{ env.IMAGE_REPO }}:${{ env.IMAGE_VERSION }}"
+        docker build -t "${repo_lowercase,,}" -f komodo/Dockerfile_linux komodo/
 
     - name: Docker Login
       uses: azure/docker-login@v1
