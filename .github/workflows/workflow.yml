@@ -33,7 +33,7 @@ jobs:
       id: repo_lowercase
 
     - name: Build and tag image
-      run: docker build -t ${{ steps.repo_lowercase.outputs.repo }} -f komodo/Dockerfile_${{ OS }} komodo/
+      run: docker build -t ${{ steps.repo_lowercase.outputs.repo }} -f komodo/Dockerfile_${{ env.OS }} komodo/
 
     - name: Docker Login
       uses: azure/docker-login@v1
@@ -62,7 +62,7 @@ jobs:
       id: repo_lowercase
 
     - name: Build and tag image
-      run: docker build -t ${{ steps.repo_lowercase.outputs.repo }} -f komodo/Dockerfile_${{ OS }} komodo/
+      run: docker build -t ${{ steps.repo_lowercase.outputs.repo }} -f komodo/Dockerfile_${{ env.OS }} komodo/
 
     - name: Docker Login
       uses: azure/docker-login@v1
