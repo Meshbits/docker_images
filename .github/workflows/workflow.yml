@@ -29,12 +29,14 @@ jobs:
 
     - name: repo_lowercase
       run: |
-        repo_lowercase="${{ env.IMAGE_REPO }}:${{ env.IMAGE_VERSION }}"
-        echo "##[set-output name=repo;]$(echo ${repo_lowercase,,})"
+        var="${{ env.IMAGE_REPO }}"
+        echo "##[set-output name=repo;]$(echo ${var,,})"
       id: repo_lowercase
 
     - name: Build and tag image
-      run: docker build -t ${{ steps.repo_lowercase.outputs.repo }} -f komodo/Dockerfile_${{ env.OS }} komodo/
+      run: |
+        docker build -t ${{ steps.repo_lowercase.outputs.repo }}:${{ env.IMAGE_VERSION }} -f komodo/Dockerfile_${{ env.OS }} komodo/
+        docker build -t ${{ steps.repo_lowercase.outputs.repo }}:latest -f komodo/Dockerfile_${{ env.OS }} komodo/
 
     - name: Docker Login
       uses: azure/docker-login@v1
@@ -44,7 +46,9 @@ jobs:
         password: ${{ secrets.ns408_packages_token }}
 
     - name: Publish image
-      run: docker push ${{ steps.repo_lowercase.outputs.repo }}
+      run: |
+        docker push ${{ steps.repo_lowercase.outputs.repo }}:${{ env.IMAGE_VERSION }}
+        docker push ${{ steps.repo_lowercase.outputs.repo }}:latest
 
   komodobuild_win:
     name: komodobuild_win
@@ -58,12 +62,14 @@ jobs:
 
     - name: repo_lowercase
       run: |
-        repo_lowercase="${{ env.IMAGE_REPO }}:${{ env.IMAGE_VERSION }}"
-        echo "##[set-output name=repo;]$(echo ${repo_lowercase,,})"
+        var="${{ env.IMAGE_REPO }}"
+        echo "##[set-output name=repo;]$(echo ${var,,})"
       id: repo_lowercase
 
     - name: Build and tag image
-      run: docker build -t ${{ steps.repo_lowercase.outputs.repo }} -f komodo/Dockerfile_${{ env.OS }} komodo/
+      run: |
+        docker build -t ${{ steps.repo_lowercase.outputs.repo }}:${{ env.IMAGE_VERSION }} -f komodo/Dockerfile_${{ env.OS }} komodo/
+        docker build -t ${{ steps.repo_lowercase.outputs.repo }}:latest -f komodo/Dockerfile_${{ env.OS }} komodo/
 
     - name: Docker Login
       uses: azure/docker-login@v1
@@ -73,4 +79,6 @@ jobs:
         password: ${{ secrets.ns408_packages_token }}
 
     - name: Publish image
-      run: docker push ${{ steps.repo_lowercase.outputs.repo }}
+      run: |
+        docker push ${{ steps.repo_lowercase.outputs.repo }}:${{ env.IMAGE_VERSION }}
+        docker push ${{ steps.repo_lowercase.outputs.repo }}:latest
