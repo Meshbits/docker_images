@@ -5,8 +5,17 @@ RUN apt-get update -qq -y \
   && ACCEPT_EULA=Y apt-get upgrade -qq -y \
   && apt-get install --no-install-recommends -qq -y \
     build-essential pkg-config libc6-dev m4 g++-multilib autoconf libtool \
-    libncurses-dev unzip clang libsodium-dev ncurses-dev git python3 python3-zmq \
-    curl mingw-w64 zlib1g-dev wget bsdmainutils automake libboost-all-dev \
-    libssl-dev libprotobuf-dev protobuf-compiler libqrencode-dev libdb++-dev ntp \
-    ntpdate software-properties-common libevent-dev libcurl4-gnutls-dev cmake \
+    libncurses-dev zip unzip clang libsodium-dev ncurses-dev git python3 \
+    python3-zmq curl mingw-w64 zlib1g-dev wget bsdmainutils automake \
+    libboost-all-dev libssl-dev libprotobuf-dev protobuf-compiler \
+    libqrencode-dev libdb++-dev ntp ntpdate software-properties-common \
+    libevent-dev libcurl4-gnutls-dev cmake \
+  && curl https://sh.rustup.rs -sSf | sh -s -- -y \
+  && /bin/bash -c 'source $HOME/.cargo/env && rustup target add x86_64-pc-windows-gnu' \
+  && update-alternatives --set x86_64-w64-mingw32-gcc /usr/bin/x86_64-w64-mingw32-gcc-posix \
+  && update-alternatives --set x86_64-w64-mingw32-g++ /usr/bin/x86_64-w64-mingw32-g++-posix \
+  # Compile and install curl for mingw libs \
+  && git clone https://github.com/curl/curl.git && cd curl && ./buildconf \
+  && ./configure --build x86_64-pc-linux-gnu --host x86_64-w64-mingw32 --prefix=/usr/x86_64-w64-mingw32 \
+  && make && make install && rm -rf curl \
   && apt-get clean -qq -y && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*

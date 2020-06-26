@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # Script to build a local docker image
+set -e
 
 SCRIPTNAME="$(realpath $0)"
 SCRIPTPATH="$(dirname $SCRIPTNAME)"
