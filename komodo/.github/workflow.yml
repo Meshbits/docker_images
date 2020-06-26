@@ -1,0 +1,63 @@
+name: Meshbits docker images
+
+on:
+  push:
+  # everyday at 3 am
+  schedule:
+    - cron: '* 3 * * *'
+
+jobs:
+
+  komodobuild_linux:
+    name: komodobuild_linux
+    runs-on: ubuntu-20.04
+    env:
+      IMAGE_REPO: docker.pkg.github.com/${{ github.repository }}/${{ github.job }}
+      IMAGE_VERSION: 0.${{ github.run_number }}
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Build and tag image - "${{ env.IMAGE_REPO }}:${{ env.IMAGE_VERSION }}"
+      run: |
+        docker build -t "${{ env.IMAGE_REPO }}:${{ env.IMAGE_VERSION }}" -f komodo/Dockerfile_linux komodo/
+
+    - name: Docker Login
+      uses: azure/docker-login@v1
+      with:
+        login-server: docker.pkg.github.com
+        username: $GITHUB_ACTOR
+        password: ${{ secrets.ns408_packages_token }}
+
+    - name: Publish image
+      run: docker push "${{ env.IMAGE_REPO }}:${{ env.IMAGE_VERSION }}"
+
+  komodobuild_win:
+    name: komodobuild_win
+    runs-on: ubuntu-20.04
+    env:
+      IMAGE_REPO: docker.pkg.github.com/${{ github.repository }}/${{ github.job }}
+      IMAGE_VERSION: 0.${{ github.run_number }}
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+      with:
+        repository: "Meshbits/docker_images"
+        branch: "master"
+
+
+    - name: Build and tag image - "${{ env.IMAGE_REPO }}:${{ env.IMAGE_VERSION }}"
+      run: |
+        docker build -t "${{ env.IMAGE_REPO }}:${{ env.IMAGE_VERSION }}" -f komodo/Dockerfile_win komodo/
+
+    - name: Docker Login
+      uses: azure/docker-login@v1
+      with:
+        login-server: docker.pkg.github.com
+        username: $GITHUB_ACTOR
+        password: ${{ secrets.ns408_packages_token }}
+
+    - name: Publish image
+      run: docker push "${{ env.IMAGE_REPO }}:${{ env.IMAGE_VERSION }}"
