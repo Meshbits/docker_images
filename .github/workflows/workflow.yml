@@ -2,9 +2,9 @@ name: Meshbits docker images
 
 on:
   push:
-  # everyday at 3 am
+  # Every Sunday at 2PM UTC (12AM AEST)
   schedule:
-    - cron: '* 3 * * *'
+    - cron: '0 14 * * Sun'
 
 env:
 #  IMAGE_REPO: docker.pkg.github.com/${{ github.repository }}/${{ github.job }}
